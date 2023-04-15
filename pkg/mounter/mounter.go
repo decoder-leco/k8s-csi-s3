@@ -26,12 +26,12 @@ type Mounter interface {
 }
 
 const (
-	s3fsMounterType     = "s3fs"
-	geesefsMounterType  = "geesefs"
-	rcloneMounterType   = "rclone"
-	TypeKey             = "mounter"
-	BucketKey           = "bucket"
-	OptionsKey          = "options"
+	s3fsMounterType    = "s3fs"
+	geesefsMounterType = "geesefs"
+	rcloneMounterType  = "rclone"
+	TypeKey            = "mounter"
+	BucketKey          = "bucket"
+	OptionsKey         = "options"
 )
 
 // New returns a new mounter depending on the mounterType parameter
@@ -64,7 +64,7 @@ func fuseMount(path string, command string, args []string) error {
 
 	out, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("Error fuseMount command: %s\nargs: %s\noutput: %s", command, args, out)
+		return fmt.Errorf("Error fuseMount command: %s\nargs: %s\nerr: %v\noutput: %s", command, args, err, out)
 	}
 
 	return waitForMount(path, 10*time.Second)
@@ -84,8 +84,8 @@ func SystemdUnmount(volumeID string) (bool, error) {
 		return false, err
 	}
 	defer conn.Close()
-	unitName := "geesefs-"+systemd.PathBusEscape(volumeID)+".service"
-	units, err := conn.ListUnitsByNames([]string{ unitName })
+	unitName := "geesefs-" + systemd.PathBusEscape(volumeID) + ".service"
+	units, err := conn.ListUnitsByNames([]string{unitName})
 	glog.Errorf("Got %v", units)
 	if err != nil {
 		glog.Errorf("Failed to list systemd unit by name %v: %v", unitName, err)
